@@ -1,17 +1,20 @@
-import { useEffect } from 'react'
-import { reqResApi } from '../api/reqRes';
-import { ReqResList } from '../interfaces/reqRes';
+import { useUsers } from '../hooks/useUsers';
+import { User } from '../interfaces/reqRes';
 
 export const Users = () => {
-    //const [users, setUsers] = useState<User[]>([]);
+    const { users, page, nextPage, previousPage } = useUsers();
 
-    useEffect(() => {
-        reqResApi.get<ReqResList>('/users')
-            .then(resp => {
-                console.log(resp.data.data);
-            })
-            .catch(console.error);
-    }, []);
+    const renderItem = ({id, first_name, last_name, email, avatar }:User) => {
+        return (
+            <tr key={ id.toString() }>
+                <td>
+                    <img src={ avatar } alt={first_name} style={{ width: 50, borderRadius: 100 }} />
+                </td>
+                <td>{ first_name + ' ' + last_name }</td>
+                <td>{ email }</td>
+            </tr>
+        );
+    }
 
     return (
         <>
@@ -25,8 +28,16 @@ export const Users = () => {
                    </tr>
                </thead>
                <tbody>
+                   {
+                       users.map(renderItem)
+                   }
                </tbody>
-           </table>
+            </table>
+            <div className="d-grid gap-2 d-md-flex justify-content-md-center">
+                <button className="btn btn-primary me-md-2" type="button" onClick={ previousPage }>Previous</button>
+                <span className="ml-2 mr-2">{ page }</span>
+                <button className="btn btn-primary" type="button" onClick={ nextPage }>Next</button>
+            </div>
         </>
     )
 }
